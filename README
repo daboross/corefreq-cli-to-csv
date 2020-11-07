@@ -1,0 +1,65 @@
+# corefreq-cli-to-csv
+
+This is a utility meant to assist with graphing data captured from the
+[CoreFreq] tool. See the [CoreFreq github page][CoreFreq] for more information
+on the tool itself.
+
+In short, CoreFreq is a CPU monitoring tool intended to retrieve actual CPU
+clock speeds. It comes with a CLI tool for live monitoring, but I've not yet
+found an easy way to graph the data over time. To fix that, this tool allows
+consuming corefreq's JSON output and turning it into a CSV file. The CSV file
+can then be imported into other software to graph.
+
+## Installing
+
+To build, you'll need to get Rust and Cargo, either through your package
+manager, or using [rustup](https://rustup.rs/). Then either install the latest
+git version:
+
+```
+cargo install --git https://github.com/daboross/corefreq-cli-to-csv.git
+```
+
+Or clone locally and install from there:
+
+```
+git clone https://github.com/daboross/corefreq-cli-to-csv.git
+cd corefreq-cli-to-csv
+cargo install --path .
+```
+
+
+## Usage
+
+```
+(while true; do corefreq-cli -j; echo; sleep 0.5; done) | corefreq-cli-to-csv > record.csv
+```
+
+## Input format
+
+`corefreq-cli-to-csv` consumes input in the form of multiple newline-separated
+JSON objects. Each JSON object should be structured like so:
+
+```json
+{
+    "Cpu": [
+        {
+            "Clock": {
+                "Q": 99,
+                "R": 811456,
+                "Hz": 99811456,
+            },
+            ...
+        },
+        ...
+    ],
+    ...
+}
+```
+
+## Output format
+
+For each input line, `corefreq-cli-to-csv` outputs exactly one output line, with
+one column per CPU core which is that CPU core's clock speed in hertz.
+
+```csv
